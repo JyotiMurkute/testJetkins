@@ -1,0 +1,143 @@
+<-------------Credentials------------->
+
+CREATE TABLE Credentials(
+User_Id Number(10) PRIMARY KEY,
+User_Name Varchar2(50) NOT NULL,
+Password Varchar2(50) NOT NULL
+);
+
+CREATE SEQUENCE user_id_seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE
+NOCYCLE;
+
+INSERT INTO Credentials(User_Id, User_Name, Password) 
+VALUES(user_id_seq.NEXTVAL, 'test','test');
+
+INSERT INTO Credentials(User_Id, User_Name, Password) 
+VALUES(user_id_seq.NEXTVAL, 'admin','pass');
+
+
+
+<-------------Passengers---------------->
+
+CREATE TABLE Passengers(
+Passenger_Id Number(10) ,
+First_Name Varchar2(50) NOT NULL,
+Last_Name Varchar2(50),
+Gender Varchar2(10),
+Email_Id Varchar2(50),
+Mobile_Number Number(10),
+Age Number(3),
+CONSTRAINT Fk_UserId FOREIGN KEY (Passenger_Id) REFERENCES Credentials(User_Id)
+);
+
+INSERT INTO Passengers(Passenger_Id, First_Name, Last_Name, Gender, Email_Id, Mobile_Number, Age)
+VALUES(user_id_seq.CURRVAL, 'Sahil', 'Joshi','Male', 'test', 1234567890, 12);
+
+
+
+<-------------CoPassengers---------------->
+
+CREATE TABLE CoPassengers(
+Co_Passenger_Id Number(10) PRIMARY KEY,
+First_Name Varchar2(50) NOT NULL,
+Last_Name Varchar2(50),
+Gender Varchar2(10),
+Age Number(3),
+Passenger_Id Number(10),
+CONSTRAINT Fk_CoUserId FOREIGN KEY (Passenger_Id) REFERENCES Credentials(User_Id)
+);
+
+CREATE SEQUENCE co_passenger_id_seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE
+NOCYCLE;
+
+INSERT INTO CoPassengers(Co_Passenger_Id, First_Name, Last_Name, Gender, Age, Passenger_Id)
+VALUES(co_passenger_id_seq.NEXTVAL, 'Hello', 'World','Male', 23, user_id_seq.CURRVAL);
+
+
+
+<-------------Flights----------------> 		*** Add Seats before adding another flight.
+
+CREATE TABLE Flights(
+Flight_Id Number(10) PRIMARY KEY,
+Airport_Name Varchar(50),
+Airline_Name Varchar(20),
+Source Varchar2(50),
+Destination Varchar2(50),
+Departure_Date Date,
+Departure_Time Varchar2(10),
+Arrival_Time Varchar2(10),
+Duration Varchar2(10),
+Total_Seats Number(3),
+Available_Seats Number(3),
+Base_Price Number(5)
+);
+
+CREATE SEQUENCE flight_id_seq
+START WITH 1000
+INCREMENT BY 1
+NOCACHE
+NOCYCLE;
+
+INSERT INTO Flights(Flight_Id, Airport_Name, Airline_Name, Source, Destination, Departure_Date, Departure_Time, Arrival_Time, Duration, Total_Seats, Available_Seats, Base_Price)
+VALUES(flight_id_seq.NEXTVAL, 'ABC Airport', 'Air India', 'Mumbai', 'Delhi', TO_DATE('17/1/2020', 'DD/MM/YYYY'), '13:00', '11:00', '1hr 30min', 48, 48, 2500);
+
+
+
+<-------------Seats---------------->
+
+CREATE TABLE Seats(
+Flight_Id Number(10),
+Seat_Id Varchar2(4),
+Passenger_Id Number(10),
+CONSTRAINT Pk_CompSeat PRIMARY KEY (Flight_Id, Seat_Id),
+CONSTRAINT Fk_FlightSeatId FOREIGN KEY (Flight_Id) REFERENCES Flights(Flight_Id)
+);
+
+
+INSERT INTO Seats(Flight_Id, Seat_Id, Passenger_Id)
+VALUES(flight_id_seq.CURRVAL, '1A',null);
+
+
+
+<-------------Tickets---------------->
+
+CREATE TABLE Tickets(
+Ticket_Number Number(6) PRIMARY KEY,
+Passenger_Id Number(10),
+Flight_Id Number(10),
+Departure_Date Date,
+Departure_Time Varchar2(10),
+Airport_Name Varchar(50),
+Class Varchar2(10),
+Number_Of_Tickets Number(3),
+Total_Cost Number(7),
+Status Varchar2(10),
+CONSTRAINT Fk_TicketUserId FOREIGN KEY (Passenger_Id) REFERENCES Credentials(User_Id),
+CONSTRAINT Fk_TicketFlightId FOREIGN KEY (Flight_Id) REFERENCES Flights(Flight_Id)
+);
+
+CREATE SEQUENCE ticket_number_seq
+START WITH 100
+INCREMENT BY 1
+NOCACHE
+NOCYCLE;
+
+INSERT INTO Tickets(Ticket_Number, Passenger_Id, Flight_Id, Departure_Date, Departure_Time, Airport_Name, Class, Number_Of_Tickets, Total_Cost, Status)
+VALUES(ticket_number_seq.NEXTVAL, user_id_seq.CURRVAL, flight_id_seq.CURRVAL, TO_DATE('17/1/2020', 'DD/MM/YYYY'), '13:00', 'ABC Airport', 'ECONOMY', 2,5220, 'Booked');
+
+
+INSERT INTO Tickets(Ticket_Number, Passenger_Id, Flight_Id, Departure_Date, Departure_Time, Airport_Name, Class, Number_Of_Tickets, Total_Cost, Status)
+VALUES(ticket_number_seq.NEXTVAL, 1, 1000, TO_DATE('17/1/2020', 'DD/MM/YYYY'), '13:00', 'ABC Airport', 'ECONOMY', 2,5220, 'Booked');
+
+
+
+
+
+
+
