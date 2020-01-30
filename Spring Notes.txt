@@ -1,3 +1,0 @@
-Autowire
-
-2. byType ->  will search for the bean with the same type/class as the field in the bean.
